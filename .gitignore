@@ -1,0 +1,65 @@
+# SmartPPE — Warden's Eye (.gitignore)
+
+# Environment variables and secrets (NEVER commit real secrets)
+.env
+.env.*
+!.env.example
+
+# Node.js dependencies, build outputs, and caches
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+.npm/
+.eslintcache
+.parcel-cache/
+*.tsbuildinfo
+
+# Python / ML virtual environments, caches, and local weights
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Local private evidence uploads and runtime databases
+uploads/
+evidence/
+.cache/
+backend/.cache/
+*.sqlite
+*.sqlite3
+*.db
+
+# ESP32 / Arduino local secret headers and build artifacts
+hardware/**/secrets.h
+.pio/
+build_esp32/
+
+# Logs and runtime PID files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# IDE, Editor, and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

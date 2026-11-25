@@ -1,0 +1,13 @@
+# SmartPPE Backend (.gitignore)
+.env
+.env.*
+!.env.example
+node_modules/
+coverage/
+logs/
+*.log
+uploads/
+evidence/
+.cache/
+.DS_Store
+Thumbs.db
