@@ -645,17 +645,17 @@ These endpoints are reserved for the **future on-chain blockchain anchoring exte
 |---|---|---|
 | Health Check (`GET /api/health`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
 | Authentication (`POST /api/auth/register`, `/login`, `GET /api/auth/me`, `POST /api/auth/logout`, `GET /api/users/me`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
-| Worker Read & Self-Service (`GET /api/workers`, `GET /api/workers/me`, `GET /api/workers/:id`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (Write CRUD `POST/PUT/DELETE /api/workers` planned for Phase 2) |
-| Workplace Zone Read (`GET /api/zones`, `GET /api/zones/:id`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (Admin CRUD `/api/admin/zones` planned for Phase 2) |
-| RFID Ingestion (`/api/rfid`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Next Phase) |
-| Device Management (`/api/devices`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Next Phase) |
-| Camera Management (`/api/cameras`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Next Phase) |
-| PPE Detections (`/api/detections`) | `SPECIFIED` | `NOT IMPLEMENTED` |
-| Environmental Sensors (`/api/sensors`) | `SPECIFIED` | `NOT IMPLEMENTED` |
-| Incident Management & SHA-256 Integrity (`/api/incidents`) | `SPECIFIED` | `NOT IMPLEMENTED` |
-| Supervisor Verification (`/api/supervisor`) | `SPECIFIED` | `NOT IMPLEMENTED` |
-| Administrator Management (`/api/admin`) | `SPECIFIED` | `NOT IMPLEMENTED` |
-| Dashboard & Analytics (`/api/dashboard`) | `SPECIFIED` | `NOT IMPLEMENTED` |
+| Worker Management (`GET /api/workers`, `GET /api/workers/me`, `GET /api/workers/:id`, `POST /api/workers`, `PUT /api/workers/:id`, `DELETE /api/workers/:id`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
+| Workplace Zone Read (`GET /api/zones`, `GET /api/zones/:id`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
+| Administrator Management (`GET /api/admin/overview`, `GET/POST/PUT/DELETE /api/admin/zones`, `POST/DELETE /api/admin/zones/:id/assign-supervisor`, `GET/POST/PUT/DELETE /api/admin/supervisors`, `GET /api/admin/audit-logs`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
+| RFID Ingestion (`POST /api/rfid/scan`, `GET /api/rfid/logs`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
+| Device Management (`POST /api/devices`, `GET /api/devices`, `GET /api/devices/:id`, `PATCH /api/devices/:id`, `POST /api/devices/:id/rotate-key`, `POST /api/devices/heartbeat`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
+| Camera Management (`/api/cameras`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 4) |
+| PPE Detections (`/api/detections`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 4) |
+| Environmental Sensors (`POST /api/sensors/events`, `GET /api/sensors/events`, `GET /api/sensors/status`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
+| Incident Management & SHA-256 Integrity (`/api/incidents`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 5 & 6) |
+| Supervisor Verification (`/api/supervisor`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 5) |
+| Dashboard & Analytics (`/api/dashboard`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 8) |
 | Real-Time WebSockets | `SPECIFIED` | `NOT IMPLEMENTED` |
 | Blockchain Anchoring (`/api/blockchain`) | `FUTURE SCOPE` | `NOT STARTED` |
 

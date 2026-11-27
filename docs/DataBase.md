@@ -354,11 +354,11 @@ USERS (1) <---- (0..1) WORKERS (via workers.userId)
 | 2. `workers` (`Worker.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/Worker.model.js`) |
 | 3. `zones` (`Zone.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/Zone.model.js`) |
 | 4. `zoneAssignments` (`ZoneAssignment.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/ZoneAssignment.model.js`) |
-| 5. `devices` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` (Planned Next Phase) |
-| 6. `cameras` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` (Planned Next Phase) |
-| 7. `rfidLogs` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` (Planned Next Phase) |
-| 8. `ppeDetections` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` |
-| 9. `sensorEvents` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` |
-| 10. `incidents` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` |
-| 11. `incidentEvidence` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` |
-| 12. `auditLogs` | `PROPOSED & ALIGNED` | `NOT IMPLEMENTED` |
+| 5. `devices` (`Device.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/Device.model.js`) |
+| 6. `cameras` (`Camera.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/Camera.model.js`) |
+| 7. `rfidLogs` (`RfidLog.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/RfidLog.model.js`) |
+| 8. `ppeDetections` (`PpeDetection.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/PpeDetection.model.js`) |
+| 9. `sensorEvents` (`SensorEvent.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/SensorEvent.model.js`) |
+| 10. `incidents` (`Incident.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/Incident.model.js`) |
+| 11. `incidentEvidence` (`IncidentEvidence.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/IncidentEvidence.model.js`) |
+| 12. `auditLogs` (`AuditLog.model.js`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (`backend/src/models/AuditLog.model.js`) |

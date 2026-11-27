@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 const { Worker } = require('../models/Worker.model');
+const { Zone } = require('../models/Zone.model');
+const { User } = require('../models/User.model');
+const { recordAuditLog } = require('../services/audit.service');
 const { AppError } = require('../utils/AppError');
 const { sendSuccess } = require('../utils/apiResponse');
 
@@ -152,8 +155,192 @@ const getWorkerById = async (req, res, next) => {
   }
 };
 
+/**
+ * POST /api/workers
+ * Restricted strictly to ADMINISTRATOR per SECURITY_AND_ROLES.md.
+ */
+const createWorker = async (req, res, next) => {
+  try {
+    const { employeeCode, name, department, designation, zoneId, rfidUid, userId, status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(zoneId)) {
+      return next(new AppError('Invalid zoneId format.', 400, 'INVALID_IDENTIFIER'));
+    }
+
+    const zone = await Zone.findById(zoneId);
+    if (!zone) {
+      return next(new AppError('Assigned workplace zone not found.', 404, 'ZONE_NOT_FOUND'));
+    }
+
+    if (userId) {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return next(new AppError('Invalid userId format.', 400, 'INVALID_IDENTIFIER'));
+      }
+      const linkedUser = await User.findById(userId);
+      if (!linkedUser) {
+        return next(new AppError('Linked user account not found.', 404, 'USER_NOT_FOUND'));
+      }
+      if (linkedUser.role !== 'WORKER') {
+        return next(
+          new AppError(
+            `Cannot link a user with role '${linkedUser.role}' to a worker profile. Linked user must have role WORKER.`,
+            400,
+            'INVALID_USER_ROLE'
+          )
+        );
+      }
+    }
+
+    const newWorker = await Worker.create({
+      employeeCode,
+      name,
+      department,
+      designation: designation || null,
+      zoneId,
+      rfidUid: rfidUid || null,
+      userId: userId || null,
+      status: status || 'ACTIVE',
+    });
+
+    await recordAuditLog({
+      actorId: req.user.userId,
+      actorRole: req.user.role,
+      action: 'WORKER_CREATED',
+      entityType: 'WORKER',
+      entityId: newWorker.workerId,
+      details: {
+        employeeCode: newWorker.employeeCode,
+        name: newWorker.name,
+        department: newWorker.department,
+        zoneId: newWorker.zoneId.toString(),
+        rfidUid: newWorker.rfidUid,
+      },
+    });
+
+    const populatedWorker = await Worker.findById(newWorker._id).populate('zoneId', 'zoneCode zoneName status');
+
+    return sendSuccess(res, 201, 'Worker registered successfully', {
+      worker: populatedWorker,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * PUT /api/workers/:id
+ * Restricted strictly to ADMINISTRATOR.
+ */
+const updateWorker = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new AppError('Invalid worker ID format.', 400, 'INVALID_IDENTIFIER'));
+    }
+
+    const worker = await Worker.findById(id);
+    if (!worker) {
+      return next(new AppError('Worker not found.', 404, 'WORKER_NOT_FOUND'));
+    }
+
+    const updates = req.body;
+
+    if (updates.zoneId) {
+      if (!mongoose.Types.ObjectId.isValid(updates.zoneId)) {
+        return next(new AppError('Invalid zoneId format.', 400, 'INVALID_IDENTIFIER'));
+      }
+      const zone = await Zone.findById(updates.zoneId);
+      if (!zone) {
+        return next(new AppError('Assigned workplace zone not found.', 404, 'ZONE_NOT_FOUND'));
+      }
+    }
+
+    if (updates.userId) {
+      if (!mongoose.Types.ObjectId.isValid(updates.userId)) {
+        return next(new AppError('Invalid userId format.', 400, 'INVALID_IDENTIFIER'));
+      }
+      const linkedUser = await User.findById(updates.userId);
+      if (!linkedUser) {
+        return next(new AppError('Linked user account not found.', 404, 'USER_NOT_FOUND'));
+      }
+      if (linkedUser.role !== 'WORKER') {
+        return next(
+          new AppError(
+            `Cannot link a user with role '${linkedUser.role}' to a worker profile. Linked user must have role WORKER.`,
+            400,
+            'INVALID_USER_ROLE'
+          )
+        );
+      }
+    }
+
+    Object.assign(worker, updates);
+    await worker.save();
+
+    await recordAuditLog({
+      actorId: req.user.userId,
+      actorRole: req.user.role,
+      action: 'WORKER_UPDATED',
+      entityType: 'WORKER',
+      entityId: worker.workerId,
+      details: updates,
+    });
+
+    const populatedWorker = await Worker.findById(worker._id).populate('zoneId', 'zoneCode zoneName status');
+
+    return sendSuccess(res, 200, 'Worker updated successfully', {
+      worker: populatedWorker,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * DELETE /api/workers/:id
+ * Restricted strictly to ADMINISTRATOR.
+ * Deactivates the worker profile (`status: 'INACTIVE'`, clears active `rfidUid` if requested) and records audit log.
+ */
+const deleteWorker = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new AppError('Invalid worker ID format.', 400, 'INVALID_IDENTIFIER'));
+    }
+
+    const worker = await Worker.findById(id);
+    if (!worker) {
+      return next(new AppError('Worker not found.', 404, 'WORKER_NOT_FOUND'));
+    }
+
+    worker.status = 'INACTIVE';
+    await worker.save();
+
+    await recordAuditLog({
+      actorId: req.user.userId,
+      actorRole: req.user.role,
+      action: 'WORKER_DEACTIVATED',
+      entityType: 'WORKER',
+      entityId: worker.workerId,
+      details: {
+        employeeCode: worker.employeeCode,
+        status: 'INACTIVE',
+      },
+    });
+
+    return sendSuccess(res, 200, 'Worker deactivated successfully', {
+      worker,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
   getWorkers,
   getMyWorkerProfile,
   getWorkerById,
+  createWorker,
+  updateWorker,
+  deleteWorker,
 };

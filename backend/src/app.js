@@ -12,6 +12,10 @@ const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const workerRoutes = require('./routes/worker.routes');
 const zoneRoutes = require('./routes/zone.routes');
+const adminRoutes = require('./routes/admin.routes');
+const deviceRoutes = require('./routes/device.routes');
+const rfidRoutes = require('./routes/rfid.routes');
+const sensorRoutes = require('./routes/sensor.routes');
 
 const app = express();
 
@@ -65,11 +69,15 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// 7. Initial Foundation API Routes
+// 7. Initial Foundation, Phase 2 Admin & Phase 3 Hardware Ingestion API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/workers', workerRoutes);
 app.use('/api/zones', zoneRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/devices', deviceRoutes);
+app.use('/api/rfid', rfidRoutes);
+app.use('/api/sensors', sensorRoutes);
 
 // 8. 404 Not Found & Centralized Error Handling
 app.use(notFoundHandler);

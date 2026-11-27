@@ -5,6 +5,7 @@ const { User } = require('../models/User.model');
 const { AppError } = require('../utils/AppError');
 const { sendSuccess } = require('../utils/apiResponse');
 const { attachRoleContext, revokeToken } = require('../middleware/auth.middleware');
+const { recordAuditLog } = require('../services/audit.service');
 
 /**
  * Generate a signed JWT access token for a user.
@@ -80,6 +81,19 @@ const register = async (req, res, next) => {
 
     const userContext = await attachRoleContext(newUser);
 
+    await recordAuditLog({
+      actorId: req.user ? req.user.userId : newUser._id,
+      actorRole: req.user ? req.user.role : assignedRole,
+      action: 'USER_REGISTERED',
+      entityType: 'USER',
+      entityId: newUser.userId,
+      details: {
+        email: newUser.email,
+        role: newUser.role,
+        bootstrap: isFirstUserBootstrap,
+      },
+    });
+
     return sendSuccess(res, 201, 'User registered successfully', {
       user: userContext,
     });
@@ -113,6 +127,17 @@ const login = async (req, res, next) => {
     const token = signAccessToken(userDoc);
     const { jwtExpiresIn } = getEnv();
     const userContext = await attachRoleContext(userDoc);
+
+    await recordAuditLog({
+      actorId: userDoc._id,
+      actorRole: userDoc.role,
+      action: 'USER_LOGIN',
+      entityType: 'USER',
+      entityId: userDoc.userId,
+      details: {
+        email: userDoc.email,
+      },
+    });
 
     return sendSuccess(res, 200, 'Login successful', {
       token,
