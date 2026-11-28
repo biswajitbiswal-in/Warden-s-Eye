@@ -650,8 +650,8 @@ These endpoints are reserved for the **future on-chain blockchain anchoring exte
 | Administrator Management (`GET /api/admin/overview`, `GET/POST/PUT/DELETE /api/admin/zones`, `POST/DELETE /api/admin/zones/:id/assign-supervisor`, `GET/POST/PUT/DELETE /api/admin/supervisors`, `GET /api/admin/audit-logs`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
 | RFID Ingestion (`POST /api/rfid/scan`, `GET /api/rfid/logs`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
 | Device Management (`POST /api/devices`, `GET /api/devices`, `GET /api/devices/:id`, `PATCH /api/devices/:id`, `POST /api/devices/:id/rotate-key`, `POST /api/devices/heartbeat`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
-| Camera Management (`/api/cameras`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 4) |
-| PPE Detections (`/api/detections`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 4) |
+| Camera Management (`POST /api/cameras`, `GET /api/cameras`, `GET /api/cameras/:id`, `PATCH /api/cameras/:id`, `PATCH /api/cameras/:id/status`, `POST /api/cameras/heartbeat`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
+| PPE Detections (`POST /api/detections`, `GET /api/detections`, `GET /api/detections/:id`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` (Backend & Mock ML Verified; Real ML Model Pending Teammate Push) |
 | Environmental Sensors (`POST /api/sensors/events`, `GET /api/sensors/events`, `GET /api/sensors/status`) | `SPECIFIED` | `IMPLEMENTED & VERIFIED` |
 | Incident Management & SHA-256 Integrity (`/api/incidents`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 5 & 6) |
 | Supervisor Verification (`/api/supervisor`) | `SPECIFIED` | `NOT IMPLEMENTED` (Planned Phase 5) |

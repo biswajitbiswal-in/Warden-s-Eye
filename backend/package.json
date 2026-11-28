@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
+    "db:local": "node src/scripts/start-local-mongo.js",
+    "db:check": "node src/scripts/verify-db-connection.js",
+    "mock:ml": "node src/scripts/smartphone-camera-mock-runner.js --once",
     "test": "node --test tests/**/*.test.js"
   },
   "engines": {

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const CAMERA_STATUSES = ['ONLINE', 'OFFLINE', 'STREAM_ERROR', 'MAINTENANCE'];
-const STREAM_TYPES = ['LOCAL_USB', 'RTSP', 'IP_HTTP'];
+const STREAM_TYPES = ['SMARTPHONE_WIFI', 'LOCAL_USB', 'RTSP', 'IP_HTTP'];
 
 const cameraSchema = new mongoose.Schema(
   {
@@ -37,15 +37,31 @@ const cameraSchema = new mongoose.Schema(
       type: String,
       enum: {
         values: STREAM_TYPES,
-        message: 'Stream type must be LOCAL_USB, RTSP, or IP_HTTP',
+        message: 'Stream type must be SMARTPHONE_WIFI, LOCAL_USB, RTSP, or IP_HTTP',
       },
-      default: 'LOCAL_USB',
+      default: 'SMARTPHONE_WIFI',
       required: true,
+    },
+    streamUrl: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: [500, 'Stream URL cannot exceed 500 characters'],
     },
     encryptedStreamCredentials: {
       type: String,
       default: null,
       select: false,
+    },
+    reconnectAttempts: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    lastStreamError: {
+      type: String,
+      default: null,
+      trim: true,
     },
     status: {
       type: String,

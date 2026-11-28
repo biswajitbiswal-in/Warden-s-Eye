@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const DETECTION_STATES = ['SAFE', 'VIOLATION', 'UNCERTAIN'];
 const PPE_SAFETY_STATUSES = ['SAFE', 'UNSAFE', 'REVIEW_REQUIRED'];
+const WORKER_IDENTIFICATION_SOURCES = ['NONE', 'RFID_CHECKPOINT_VERIFIED'];
 
 const detectedObjectSubSchema = new mongoose.Schema(
   {
@@ -53,6 +54,21 @@ const ppeDetectionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Worker',
       default: null,
+    },
+    workerIdentificationSource: {
+      type: String,
+      enum: {
+        values: WORKER_IDENTIFICATION_SOURCES,
+        message: 'workerIdentificationSource must be NONE or RFID_CHECKPOINT_VERIFIED',
+      },
+      default: 'NONE',
+      required: true,
+    },
+    isMockDetection: {
+      type: Boolean,
+      default: false,
+      required: true,
+      index: true,
     },
     trackId: {
       type: String,
@@ -153,4 +169,5 @@ module.exports = {
   PpeDetection,
   DETECTION_STATES,
   PPE_SAFETY_STATUSES,
+  WORKER_IDENTIFICATION_SOURCES,
 };

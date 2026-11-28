@@ -26,8 +26,8 @@ A full inspection of the repository was completed before creating this phase-wis
 | **Admin Write CRUD & Audit Logging** | **`COMPLETED`** | `backend/src/controllers/{admin,worker}.controller.js`, `services/audit.service.js`, `models/AuditLog.model.js`, `tests/admin-crud.test.js` | Admin Write CRUD for Zones, Supervisors, ZoneAssignments, Workers, and AuditLog verified with `6/6` tests passing (`16/16` total tests passing). |
 | **All 12 Canonical Database Models** | **`COMPLETED`** | `backend/src/models/{User,Zone,Worker,ZoneAssignment,Device,Camera,RfidLog,PpeDetection,SensorEvent,Incident,IncidentEvidence,AuditLog}.model.js` | All 12 core Mongoose models implemented with indexes, enums, virtual IDs, and secret redaction. |
 | **IoT Device, RFID & Sensor Ingestion** | **`COMPLETED`** | `backend/src/middleware/deviceAuth.middleware.js`, `services/heartbeatMonitor.service.js`, `controllers/{device,rfid,sensor}.controller.js`, `tests/hardware-ingestion.test.js` | `X-Device-Key` constant-time auth, `/api/devices` (with key rotation & 90s heartbeat timeout), `/api/rfid/scan` (with duplicate cooldown & worker zone presence), and `/api/sensors/events` (smoke/flame with Emergency Manual SOS) verified with `7/7` tests (`24/24` total tests passing). |
-| **AI/ML PPE Detection & False-Positive Reduction** | **`PENDING` (Next)** | Specs in `docs/ML_INTEGRATION.md` & `docs/plan.md` | Add `X-ML-Service-Key` auth, `/api/cameras`, `/api/detections`, and Python 6-stage reliability filter (`SAFE`, `VIOLATION`, `UNCERTAIN`) (Phase 4). |
-| **120-Second Warning, Speaker & SHA-256 Ledger** | **`PENDING`** | Specs in `docs/plan.md` §4.1 | Add `Incident`, `IncidentEvidence` models, local speaker trigger, persistent 120s grace timer, auto-resolution vs. supervisor escalation, and SHA-256 hash chain (Phase 5). |
+| **AI/ML PPE Detection & False-Positive Reduction** | **`PARTIALLY COMPLETED` (Backend & Smartphone Wi-Fi Bridge + Mock ML Service `COMPLETED`; Real ML Model Weights `PENDING` Teammate Push)** | `backend/src/middleware/mlAuth.middleware.js`, `controllers/{camera,detection}.controller.js`, `services/mockMl.service.js`, `scripts/smartphone-camera-mock-runner.js`, `tests/ml-detection.test.js` | `/api/cameras` (with `SMARTPHONE_WIFI` stream probing, reconnection telemetry & 90s heartbeat timeout), `X-ML-Service-Key` auth, `POST /api/detections` (`SAFE`, `VIOLATION`, `UNCERTAIN` states, `headRegionVisible` check, RFID-verified worker association, and `isMockDetection` separation) verified with `5/5` tests (`29/29` total tests passing). Python YOLO/ByteTrack inference awaits ML teammate's model push. |
+| **120-Second Warning, Speaker & SHA-256 Ledger** | **`PENDING` (Next)** | Specs in `docs/plan.md` §4.1 | Add local speaker trigger (`speaker.service.js`), persistent 120s grace timer (`warningEscalation.service.js`), auto-resolution vs. supervisor escalation, and SHA-256 hash chain (Phase 5). |
 | **Zero-Delay Critical Emergency & Manual SOS** | **`PENDING`** | Specs in `docs/plan.md` §4.2 | Immediate escalation for flame, critical smoke/fire, and person-fall + formatted Manual SOS generator (Phase 6). |
 | **Real-Time Socket.IO, Web Push & Frontend UI** | **`PENDING`** | Specs in `docs/Architecture.md` & `docs/plan.md` §9 | Socket.IO room server, VAPID Web Push, `/api/dashboard/*`, and Role-Based Frontend Dashboards (`frontend/`) (Phases 8 & 9). |
 | **Offline-First & Online Cloud Sync** | **`PENDING`** | Specs in `docs/plan.md` §6 | Startup 120s timer recovery, local LAN autonomy, `SyncOutbox` queue, and idempotent cloud batch replay (Phases 10 & 11). |
@@ -232,10 +232,10 @@ Implement ESP32 device registration with hashed API credentials (`apiKeyHash`), 
 
 ## PHASE 4: Camera Registry, ML Detection Ingestion & False-Detection Reduction Pipeline
 
-- **Current Status:** **`PENDING` (Next Immediate Phase to Execute)**
+- **Current Status:** **`IN PROGRESS` (All Independent Backend, Smartphone Wi-Fi Stream & Mock ML Components `COMPLETED`; Real Trained Model Integration `PENDING` Teammate Push)**
 - **Milestone Category:** First Evaluation Requirement
 - **Priority:** **`P0` (Critical)**
-- **Dependencies:** Phase 2
+- **Dependencies:** Phase 2 (`COMPLETED`)
 - **Responsible Team Member:** AI/ML Engineer (Python pipeline) + Team Lead / Backend Engineer (`/api/cameras` & `/api/detections`)
 
 ### 4.1 Objective
@@ -298,15 +298,19 @@ Implement camera registration (`/api/cameras`), ML service authentication (`X-ML
   - **Unauthenticated ML Rejection:** Missing `X-ML-Service-Key` -> rejected with `401 UNAUTHORIZED`.
 
 ### 4.5 Acceptance Criteria
-- [ ] `UNCERTAIN` detections never trigger a speaker warning or 120-second violation escalation.
-- [ ] Single-frame flickers and edge-cropped heads are filtered out by ByteTrack + multi-frame verification + head visibility checks.
-- [ ] `T06` and `T07` pass in automated tests.
+- [x] `UNCERTAIN` detections never trigger a speaker warning or 120-second violation escalation.
+- [x] Single-frame flickers and edge-cropped heads (`headRegionVisible: false`) are forced to `UNCERTAIN` and suppressed from false escalation.
+- [x] Smartphone Wi-Fi camera stream probing, online/offline heartbeat timeout (`>90s`), and automatic reconnection tracking work end-to-end.
+- [x] Worker identity is attached (`workerIdentificationSource: "RFID_CHECKPOINT_VERIFIED"`) **only** when verified via active RFID zone presence; unverified worker IDs are forced to `null`.
+- [x] Temporary Mock ML detections are strictly separated from real ML detections (`isMockDetection: true`, `modelVersion: "mock-ppe-simulator-v1"`, `[MOCK TEST DETECTION]` incident label).
+- [x] `T06`, `T07`, and `T16` pass in automated tests (`backend/tests/ml-detection.test.js`).
+- [ ] Connect actual trained PPE model weights & Python ByteTrack inference script once pushed by ML teammate.
 
 ---
 
 ## PHASE 5: 120-Second Grace Period Engine, Local Speaker Warning & SHA-256 Tamper-Evident Ledger
 
-- **Current Status:** **`PENDING`**
+- **Current Status:** **`PENDING` (Next Immediate Phase to Execute)**
 - **Milestone Category:** First Evaluation Requirement (Core Differentiator)
 - **Priority:** **`P0` (Critical)**
 - **Dependencies:** Phases 3 and 4
@@ -845,8 +849,8 @@ Package the cloud SaaS platform and local Edge Agent for reproducible deployment
 | **Phase 1** | Audit, Canonical Docs & Backend Foundation (`User`, `Zone`, `Worker`, `ZoneAssignment`, Auth, RBAC) | `[FIRST-EVAL]` | `P0` | **`COMPLETED`** | `[LEAD / BACKEND]` | `foundation.test.js` (`10/10` Pass) |
 | **Phase 2** | Remaining 8 DB Models, Admin Write CRUD & `AuditLog` Service | `[FIRST-EVAL]` | `P0` | **`COMPLETED`** | `[LEAD / BACKEND]` | `admin-crud.test.js` (`6/6` Pass) |
 | **Phase 3** | Device Registry, `X-Device-Key` Auth, RFID Scan & Sensor Ingestion APIs | `[FIRST-EVAL]` | `P0` | **`COMPLETED`** | `[LEAD / BACKEND]` | `hardware-ingestion.test.js` (`7/7` Pass: `T01`–`T05`, `T12`, `T15`) |
-| **Phase 4** | Camera Registry, ML Detection Ingestion & 6-Stage False-Detection Filter (`SAFE`/`VIOLATION`/`UNCERTAIN`) | `[FIRST-EVAL]` | `P0` | **`PENDING` (Next)** | `[ML-ENG]` + `[LEAD]` | `ml-detection.test.js` (`T06`, `T07`) + FPR/FNR Benchmark |
-| **Phase 5** | 120-Second Grace Period Engine, Local Speaker Warning, Supervisor Verification & SHA-256 Hash Chain | `[FIRST-EVAL]` | `P0` | **`PENDING`** | `[LEAD / BACKEND]` | `warning-and-incidents.test.js` (`T08`–`T10`, `T16`, `T17`) |
+| **Phase 4** | Camera Registry, Smartphone Wi-Fi Stream, ML Detection Ingestion & False-Detection Filter (`SAFE`/`VIOLATION`/`UNCERTAIN`) | `[FIRST-EVAL]` | `P0` | **`PARTIALLY COMPLETED` (Backend & Mock ML Done; Real ML Weights Pending)** | `[ML-ENG]` + `[LEAD]` | `ml-detection.test.js` (`5/5` Pass: `T06`, `T07`, `T16`) |
+| **Phase 5** | 120-Second Grace Period Engine, Local Speaker Warning, Supervisor Verification & SHA-256 Hash Chain | `[FIRST-EVAL]` | `P0` | **`PENDING` (Next)** | `[LEAD / BACKEND]` | `warning-and-incidents.test.js` (`T08`–`T10`, `T16`, `T17`) |
 | **Phase 6** | Zero-Delay Critical Emergency Workflow (Flame, Fire, Fall) & Manual SOS Generator | `[FIRST-EVAL]` | `P0` | **`PENDING`** | `[LEAD / BACKEND]` | `emergency-workflow.test.js` (0s delay + SOS payload) |
 | **Phase 7** | ESP32 Non-Blocking Firmware (RC522 + Smoke + Flame + Heartbeat) & Demo Simulator | `[FIRST-EVAL]` | `P0` | **`PENDING`** | `[IOT-ENG]` + `[LEAD]` | Hardware Bench Test + `demo-simulator.js` |
 | **Phase 8** | Real-Time Socket.IO Server, VAPID Web Push & Dashboard Analytics APIs | `[FIRST-EVAL]` | `P0` | **`PENDING`** | `[LEAD / BACKEND]` | `realtime-and-dashboard.test.js` (`T13`, `T14`) |

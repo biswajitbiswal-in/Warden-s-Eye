@@ -16,6 +16,8 @@ const adminRoutes = require('./routes/admin.routes');
 const deviceRoutes = require('./routes/device.routes');
 const rfidRoutes = require('./routes/rfid.routes');
 const sensorRoutes = require('./routes/sensor.routes');
+const cameraRoutes = require('./routes/camera.routes');
+const detectionRoutes = require('./routes/detection.routes');
 
 const app = express();
 
@@ -78,6 +80,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/devices', deviceRoutes);
 app.use('/api/rfid', rfidRoutes);
 app.use('/api/sensors', sensorRoutes);
+app.use('/api/cameras', cameraRoutes);
+app.use('/api/detections', detectionRoutes);
 
 // 8. 404 Not Found & Centralized Error Handling
 app.use(notFoundHandler);
